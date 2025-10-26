@@ -25,10 +25,10 @@ public class TestClass extends OpMode {
         CRServo blServo = hardwareMap.get(CRServo.class, "bl_rotation");
         CRServo brServo = hardwareMap.get(CRServo.class, "br_rotation");
         CRServo frServo = hardwareMap.get(CRServo.class, "fr_rotation");
-        flEncoder = new AxonAnalog(hardwareMap, "fl_absolute", 2.885, realMaxVolts, true);
-        frEncoder = new AxonAnalog(hardwareMap, "fr_absolute", 1.344, realMaxVolts, true);
-        blEncoder = new AxonAnalog(hardwareMap, "bl_absolute", 4.707, realMaxVolts, true);
-        brEncoder = new AxonAnalog(hardwareMap, "br_absolute", 5.153, realMaxVolts, true);
+        flEncoder = new AxonAnalog("fl_absolute", 0, realMaxVolts, true);
+        frEncoder = new AxonAnalog("fr_absolute", 0, realMaxVolts, true);
+        blEncoder = new AxonAnalog("bl_absolute", 0, realMaxVolts, true);
+        brEncoder = new AxonAnalog("br_absolute", 0, realMaxVolts, true);
 
         flServo.setPower(0);
         blServo.setPower(0);
