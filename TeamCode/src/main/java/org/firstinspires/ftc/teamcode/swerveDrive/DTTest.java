@@ -11,7 +11,7 @@ public class DTTest implements Subsystem {
     public static final DTTest INSTANCE = new DTTest();
     private DTTest() {}
 
-    private final double ANALOG_VOLTAGE_COMPENSATION = 3.1865;
+    private final double ANALOG_VOLTAGE_COMPENSATION = 3.22;
     public SwerveModule fl_Module, bl_Module, br_Module, fr_Module;
     public SwerveModule[] swerveModules;
 
