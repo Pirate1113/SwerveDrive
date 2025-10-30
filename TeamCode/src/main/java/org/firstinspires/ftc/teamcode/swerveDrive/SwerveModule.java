@@ -20,7 +20,7 @@ public class SwerveModule{
     final double GEAR_RATIO = 1;
     final double TICKS_PER_REVOLUTION = 1;
 
-    public static PIDCoefficients pidValues = new PIDCoefficients(0.4, 0, 0.2);
+    public static PIDCoefficients pidValues = new PIDCoefficients(0.4, 0, 0);
     public ControlSystem pid = ControlSystem.builder()
             .angular(AngleType.RADIANS, feedback -> feedback.posPid(pidValues))
             .build();

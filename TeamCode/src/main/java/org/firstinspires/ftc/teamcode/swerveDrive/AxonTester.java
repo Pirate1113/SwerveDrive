@@ -53,7 +53,10 @@ public class AxonTester extends LinearOpMode {
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
 
-
+            frontRight.setPower(0);
+            frontLeft.setPower(0);
+            backLeft.setPower(0);
+            backRight.setPower(0);
 
 
 

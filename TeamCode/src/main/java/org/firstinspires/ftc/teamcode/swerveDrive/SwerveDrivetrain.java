@@ -12,26 +12,26 @@ public class SwerveDrivetrain implements Subsystem {
     public SwerveModule fl_Module, bl_Module, br_Module, fr_Module;
 
     private final double
-            fl_offset = 12.238,
-            bl_offset = 2.99,
-            br_offset = 5.37,
-            fr_offset = 2.81;
+            fl_offset = 5.9862,
+            bl_offset = 9.24,
+            br_offset = 5.44,
+            fr_offset = 2.74;
 
     public SwerveModule[] swerveModules;
 
     @Override
     public void initialize(){
-        fl_Module = new SwerveModule(new MotorEx("fl_motor"), "fl_rotation", true,
-                "fl_absolute", fl_offset, true, ANALOG_VOLTAGE_COMPENSATION);
+        fl_Module = new SwerveModule(new MotorEx("fl_motor"), "fl_rotation", false,
+                "fl_absolute", fl_offset, false, ANALOG_VOLTAGE_COMPENSATION);
 
-        bl_Module = new SwerveModule(new MotorEx("bl_motor").reversed(), "bl_rotation", true,
-                "bl_absolute", bl_offset, true, ANALOG_VOLTAGE_COMPENSATION);
+        bl_Module = new SwerveModule(new MotorEx("bl_motor").reversed(), "bl_rotation", false,
+                "bl_absolute", bl_offset, false, ANALOG_VOLTAGE_COMPENSATION);
 
-        br_Module = new SwerveModule(new MotorEx("br_motor").reversed(), "br_rotation", true,
-                "br_absolute", br_offset, true, ANALOG_VOLTAGE_COMPENSATION);
+        br_Module = new SwerveModule(new MotorEx("br_motor").reversed(), "br_rotation", false,
+                "br_absolute", br_offset, false, ANALOG_VOLTAGE_COMPENSATION);
 
-        fr_Module = new SwerveModule(new MotorEx("fr_motor"), "fr_rotation", true,
-                "fr_absolute", fr_offset, true, ANALOG_VOLTAGE_COMPENSATION);
+        fr_Module = new SwerveModule(new MotorEx("fr_motor"), "fr_rotation", false,
+                "fr_absolute", fr_offset, false, ANALOG_VOLTAGE_COMPENSATION);
 
         swerveModules = new SwerveModule[]{fl_Module, bl_Module, br_Module, fr_Module};
     }
