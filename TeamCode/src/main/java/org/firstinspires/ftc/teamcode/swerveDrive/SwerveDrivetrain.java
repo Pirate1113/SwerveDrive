@@ -12,10 +12,10 @@ public class SwerveDrivetrain implements Subsystem {
     public SwerveModule fl_Module, bl_Module, br_Module, fr_Module;
 
     private final double
-            fl_offset = 5.9862,
-            bl_offset = 9.24,
-            br_offset = 5.44,
-            fr_offset = 2.74;
+            fl_offset = 3.03,
+            bl_offset = 4.62,
+            br_offset = 1.422,
+            fr_offset = 1.3328;
 
     public SwerveModule[] swerveModules;
 

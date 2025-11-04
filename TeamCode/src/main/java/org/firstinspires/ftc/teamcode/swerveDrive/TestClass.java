@@ -17,7 +17,7 @@ public class TestClass extends OpMode {
     AxonAnalog brEncoder;
     AxonAnalog frEncoder;
 
-    double realMaxVolts = 3.1865;
+    double realMaxVolts = 3.22;
 
     @Override
     public void init(){

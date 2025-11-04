@@ -69,10 +69,10 @@ public class AxonTester extends LinearOpMode {
             telemetry.addData("bl_servo voltage", axon3.getVoltage());
             telemetry.addData("br_servo voltage", axon4.getVoltage());
 
-            telemetry.addData("fr_servo pos", axon1.getVoltage() * 2 * TWO_PI/3.3);
-            telemetry.addData("fl_servo pos", axon2.getVoltage() * 2 * TWO_PI/3.3);
-            telemetry.addData("bl_servo pos", axon3.getVoltage() * 2 * TWO_PI/3.3);
-            telemetry.addData("br_servo pos", axon4.getVoltage() * 2 * TWO_PI/3.3);
+            telemetry.addData("fr_servo pos", axon1.getVoltage() * TWO_PI/3.3);
+            telemetry.addData("fl_servo pos", axon2.getVoltage() * TWO_PI/3.3);
+            telemetry.addData("bl_servo pos", axon3.getVoltage() * TWO_PI/3.3);
+            telemetry.addData("br_servo pos", axon4.getVoltage() * TWO_PI/3.3);
 
             telemetry.update();
         }
