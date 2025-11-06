@@ -29,9 +29,13 @@ public class SwerveModule{
     private CRServoEx rotationServo;
     private AxonAnalog absoluteAnalog;
 
+    public double xOffset;
+    public double yOffset;
+
     public SwerveModule(MotorEx drivingMotor, String servoName,
                         boolean servoReversed, String analogName,
-                        double analogOffset, boolean reverseAnalog, double analogMaxVolt){
+                        double analogOffset, boolean reverseAnalog, double analogMaxVolt,
+                        double podXOffset, double podYOffset){
 
         driveMotor = drivingMotor.brakeMode();
 
@@ -43,6 +47,9 @@ public class SwerveModule{
         }
         rotationServo.setPower(1);
         rotationServo.setPower(0);
+
+        xOffset = podXOffset;
+        yOffset = podYOffset;
     }
 
     public double getPodHeading(){
