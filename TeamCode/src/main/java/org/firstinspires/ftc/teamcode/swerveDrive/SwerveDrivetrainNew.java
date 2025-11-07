@@ -36,12 +36,13 @@ public class SwerveDrivetrainNew implements Subsystem {
                 rawRightX = ActiveOpMode.gamepad1().right_stick_x,
                 realRightX = rawRightX / Math.sqrt(2);
 
-        //double flPivotAngle = Math.PI/4, frPivotAngle = -Math.PI/4,
-              //  brPivotAngle = -3*Math.PI/4, blPivotAngle = 3*Math.PI/4;
-        //double[] pivotAngles = {flPivotAngle, blPivotAngle, brPivotAngle, frPivotAngle};
 
         double[] wheelSpeeds = new double[swerveModules.length];
-        double[] rotationAngles = new double[swerveModules.length];
+        double[] targetAngles = new double[swerveModules.length];
+
+        //motor flipping arrays
+        double[] currentAngles = new double[swerveModules.length];
+        double[] targetNormalized = new double[swerveModules.length];
 
         for (int i = 0; i < swerveModules.length; i++) {
             double rotVectorX = realRightX * swerveModules[i].yOffset;
@@ -52,7 +53,10 @@ public class SwerveDrivetrainNew implements Subsystem {
 
             // Compute final speed + angle
             wheelSpeeds[i] = Math.sqrt(resultX * resultX + resultY * resultY);
-            rotationAngles[i] = Math.atan2(resultY, resultX);
+            targetAngles[i] = Math.atan2(resultY, resultX);
+
+            currentAngles[i] = swerveModules[i].getPodHeading();
+
         }
 
         // === Normalize wheel speeds so none exceed 1.0 ===
@@ -63,16 +67,21 @@ public class SwerveDrivetrainNew implements Subsystem {
             {wheelSpeeds[i] /= max;}
         }
 
+
         for (int i = 0; i < swerveModules.length; i++){
-            ActiveOpMode.telemetry().addData("target", rotationAngles[i]); //remove later
-            ActiveOpMode.telemetry().addData("heading", swerveModules[i].getPodHeading()-Math.PI); //remove later
+            targetNormalized[i] = (targetAngles[i] + (2*Math.PI)) % (2*Math.PI);
+            double angleError = Math.abs(targetNormalized[i] - currentAngles[i]);
+            if (angleError > Math.PI/2){
+                double newAngle = (targetAngles[i] + Math.PI) % (2*Math.PI);
+                targetAngles[i] = newAngle;
+                wheelSpeeds[i] *= -1;
+            }
         }
 
-        // === Apply to each module ===
+        // Apply to each module
         for (int i = 0; i < swerveModules.length; i++) {
-            swerveModules[i].rotateTo(rotationAngles[i]);
+            swerveModules[i].rotateTo(targetAngles[i]);
             swerveModules[i].setMotorPower(wheelSpeeds[i]);
         }
-
     }
 }
