@@ -9,8 +9,11 @@ public class SwerveDrivetrainNew implements Subsystem {
     private SwerveDrivetrainNew() {}
 
     private final double ANALOG_VOLTAGE_COMPENSATION = 3.1865;
+    public static final double cacheTolerance = 0.1;
     public SwerveModule fl_Module, bl_Module, br_Module, fr_Module;
     public SwerveModule[] swerveModules;
+
+    double[] wheelSpeeds, targetAngles, currentAngles, angleErrors, cachedAngles;
 
     @Override
     public void initialize(){
@@ -27,6 +30,14 @@ public class SwerveDrivetrainNew implements Subsystem {
                 "fr_absolute", 1.351, true, ANALOG_VOLTAGE_COMPENSATION, 1, 1);
 
         swerveModules = new SwerveModule[]{fl_Module, bl_Module, br_Module, fr_Module};
+
+        wheelSpeeds = new double[swerveModules.length];
+        targetAngles = new double[swerveModules.length];
+
+        //motor flipping arrays
+        currentAngles = new double[swerveModules.length];
+        angleErrors = new double[swerveModules.length];
+        cachedAngles = new double[swerveModules.length];
     }
 
     @Override
@@ -36,13 +47,6 @@ public class SwerveDrivetrainNew implements Subsystem {
                 rawRightX = ActiveOpMode.gamepad1().right_stick_x,
                 realRightX = rawRightX / Math.sqrt(2);
 
-
-        double[] wheelSpeeds = new double[swerveModules.length];
-        double[] targetAngles = new double[swerveModules.length];
-
-        //motor flipping arrays
-        double[] currentAngles = new double[swerveModules.length];
-        double[] targetNormalized = new double[swerveModules.length];
 
         for (int i = 0; i < swerveModules.length; i++) {
             double rotVectorX = realRightX * swerveModules[i].yOffset;
@@ -67,21 +71,27 @@ public class SwerveDrivetrainNew implements Subsystem {
             {wheelSpeeds[i] /= max;}
         }
 
+        boolean joystickIsIdle = (Math.abs(rawLeftX) <= cacheTolerance && Math.abs(rawLeftY) <= cacheTolerance && Math.abs(rawRightX) <= cacheTolerance);
 
         for (int i = 0; i < swerveModules.length; i++){
-            targetNormalized[i] = (targetAngles[i] + (2*Math.PI)) % (2*Math.PI);
-            double angleError = Math.abs(targetNormalized[i] - currentAngles[i]);
-            if (angleError > Math.PI/2){
-                double newAngle = (targetAngles[i] + Math.PI) % (2*Math.PI);
-                targetAngles[i] = newAngle;
+            angleErrors[i] = Math.abs(Math.atan2(Math.sin(targetAngles[i] - currentAngles[i]), Math.cos(targetAngles[i] - currentAngles[i])));
+            if (angleErrors[i] > Math.PI/2){
+                targetAngles[i] = (targetAngles[i] + Math.PI) % (2*Math.PI);
                 wheelSpeeds[i] *= -1;
+                angleErrors[i] = Math.abs(Math.atan2(Math.sin(targetAngles[i] - currentAngles[i]), Math.cos(targetAngles[i] - currentAngles[i])));
+            }
+            wheelSpeeds[i] *= Math.abs(Math.cos(angleErrors[i]));
+
+            if (!joystickIsIdle){
+                cachedAngles[i] = targetAngles[i];
             }
         }
 
         // Apply to each module
         for (int i = 0; i < swerveModules.length; i++) {
-            swerveModules[i].rotateTo(targetAngles[i]);
             swerveModules[i].setMotorPower(wheelSpeeds[i]);
+            double commandedAngle = joystickIsIdle ? cachedAngles[i] : targetAngles[i];
+            swerveModules[i].rotateTo(commandedAngle);
         }
     }
 }
