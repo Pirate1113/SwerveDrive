@@ -1,5 +1,10 @@
 package org.firstinspires.ftc.teamcode.swerveDrive;
 
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
+import com.qualcomm.robotcore.hardware.IMU;
+
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+
 import dev.nextftc.core.subsystems.Subsystem;
 import dev.nextftc.ftc.ActiveOpMode;
 import dev.nextftc.hardware.impl.MotorEx;
@@ -10,6 +15,10 @@ public class SwerveDrivetrainNew implements Subsystem {
 
     private final double ANALOG_VOLTAGE_COMPENSATION = 3.1865;
     public static final double cacheTolerance = 0.1;
+
+    public IMU imu;
+    public RevHubOrientationOnRobot hubOrient = new RevHubOrientationOnRobot(RevHubOrientationOnRobot.LogoFacingDirection.UP,
+            RevHubOrientationOnRobot.UsbFacingDirection.RIGHT);
     public SwerveModule fl_Module, bl_Module, br_Module, fr_Module;
     public SwerveModule[] swerveModules;
 
@@ -34,6 +43,10 @@ public class SwerveDrivetrainNew implements Subsystem {
         wheelSpeeds = new double[swerveModules.length];
         targetAngles = new double[swerveModules.length];
 
+        imu = ActiveOpMode.hardwareMap().get(IMU.class, "imu");
+        imu.initialize(new IMU.Parameters(hubOrient));
+        imu.resetYaw();
+
         //motor flipping arrays
         currentAngles = new double[swerveModules.length];
         angleErrors = new double[swerveModules.length];
@@ -46,7 +59,7 @@ public class SwerveDrivetrainNew implements Subsystem {
                 rawLeftY = -ActiveOpMode.gamepad1().left_stick_y,
                 rawRightX = ActiveOpMode.gamepad1().right_stick_x,
                 realRightX = rawRightX / Math.sqrt(2);
-
+        double imuHeading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
 
         for (int i = 0; i < swerveModules.length; i++) {
             double rotVectorX = realRightX * swerveModules[i].yOffset;
@@ -85,6 +98,10 @@ public class SwerveDrivetrainNew implements Subsystem {
             if (!joystickIsIdle){
                 cachedAngles[i] = targetAngles[i];
             }
+        }
+
+        for (int i = 0; i < swerveModules.length; i++){
+            targetAngles[i] = (targetAngles[i] - imuHeading) % (2*Math.PI);
         }
 
         // Apply to each module
