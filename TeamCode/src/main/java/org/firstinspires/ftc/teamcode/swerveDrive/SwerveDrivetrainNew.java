@@ -60,6 +60,10 @@ public class SwerveDrivetrainNew implements Subsystem {
                 rawRightX = ActiveOpMode.gamepad1().right_stick_x,
                 realRightX = rawRightX / Math.sqrt(2);
         double imuHeading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+        double tempX = rawLeftX;
+        double tempY = rawLeftY;
+        rawLeftX = tempX * Math.cos(-imuHeading) - tempY * Math.sin(-imuHeading);
+        rawLeftY = tempX * Math.sin(-imuHeading) + tempY * Math.cos(-imuHeading);
 
         for (int i = 0; i < swerveModules.length; i++) {
             double rotVectorX = realRightX * swerveModules[i].yOffset;
@@ -98,10 +102,6 @@ public class SwerveDrivetrainNew implements Subsystem {
             if (!joystickIsIdle){
                 cachedAngles[i] = targetAngles[i];
             }
-        }
-
-        for (int i = 0; i < swerveModules.length; i++){
-            targetAngles[i] = (targetAngles[i] - imuHeading) % (2*Math.PI);
         }
 
         // Apply to each module
