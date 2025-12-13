@@ -12,7 +12,7 @@ import dev.nextftc.ftc.components.BulkReadComponent;
 public class SwerveNextFTCTest extends NextFTCOpMode {
     public SwerveNextFTCTest(){
         addComponents(
-                new SubsystemComponent(SwerveDrivetrain.INSTANCE),
+                new SubsystemComponent(SwerveDrivetrainNew.INSTANCE),
                 BulkReadComponent.INSTANCE,
                 BindingsComponent.INSTANCE
         );

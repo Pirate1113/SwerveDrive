@@ -18,16 +18,16 @@ public class DTTest implements Subsystem {
     @Override
     public void initialize(){
         fl_Module = new SwerveModule(new MotorEx("fl_motor"), "fl_rotation", true,
-                "fl_absolute", 6.046, true, ANALOG_VOLTAGE_COMPENSATION);
+                "fl_absolute", 6.046, true, ANALOG_VOLTAGE_COMPENSATION, 1, 1);
 
         bl_Module = new SwerveModule(new MotorEx("bl_motor"), "bl_rotation", true,
-                "bl_absolute", 4.695, true, ANALOG_VOLTAGE_COMPENSATION);
+                "bl_absolute", 4.695, true, ANALOG_VOLTAGE_COMPENSATION, 1, 1);
 
         br_Module = new SwerveModule(new MotorEx("br_motor").reversed(), "br_rotation", true,
-                "br_absolute", 2.007, true, ANALOG_VOLTAGE_COMPENSATION);
+                "br_absolute", 2.007, true, ANALOG_VOLTAGE_COMPENSATION, 1, 1);
 
         fr_Module = new SwerveModule(new MotorEx("fr_motor").reversed(), "fr_rotation", true,
-                "fr_absolute", 1.351, true, ANALOG_VOLTAGE_COMPENSATION);
+                "fr_absolute", 1.351, true, ANALOG_VOLTAGE_COMPENSATION, 1, 1);
 
         swerveModules = new SwerveModule[]{fl_Module, bl_Module, br_Module, fr_Module};
     }
