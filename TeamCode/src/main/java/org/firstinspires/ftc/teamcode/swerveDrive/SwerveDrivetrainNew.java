@@ -27,16 +27,16 @@ public class SwerveDrivetrainNew implements Subsystem {
     @Override
     public void initialize(){
         fl_Module = new SwerveModule(new MotorEx("fl_motor").reversed(), "fl_rotation", true,
-                "fl_absolute", 6.046, true, ANALOG_VOLTAGE_COMPENSATION, -1, 1);
+                "fl_absolute", 1.7+Math.PI/2, true, ANALOG_VOLTAGE_COMPENSATION, -1, 1);
 
         bl_Module = new SwerveModule(new MotorEx("bl_motor"), "bl_rotation", true,
-                "bl_absolute", 4.695, true, ANALOG_VOLTAGE_COMPENSATION, -1, -1);
+                "bl_absolute", 1.489+Math.PI/2, true, ANALOG_VOLTAGE_COMPENSATION, -1, -1);
 
         br_Module = new SwerveModule(new MotorEx("br_motor"), "br_rotation", true,
-                "br_absolute", 2.007, true, ANALOG_VOLTAGE_COMPENSATION, 1, -1);
+                "br_absolute", 0.2692+Math.PI/2, true, ANALOG_VOLTAGE_COMPENSATION, 1, -1);
 
         fr_Module = new SwerveModule(new MotorEx("fr_motor").reversed(), "fr_rotation", true,
-                "fr_absolute", 1.351, true, ANALOG_VOLTAGE_COMPENSATION, 1, 1);
+                "fr_absolute", 3.224+Math.PI/2, true, ANALOG_VOLTAGE_COMPENSATION, 1, 1);
 
         swerveModules = new SwerveModule[]{fl_Module, bl_Module, br_Module, fr_Module};
 
@@ -92,11 +92,11 @@ public class SwerveDrivetrainNew implements Subsystem {
 
         for (int i = 0; i < swerveModules.length; i++){
             angleErrors[i] = Math.abs(Math.atan2(Math.sin(targetAngles[i] - currentAngles[i]), Math.cos(targetAngles[i] - currentAngles[i])));
-            if (angleErrors[i] > Math.PI/2){
-                targetAngles[i] = (targetAngles[i] + Math.PI) % (2*Math.PI);
-                wheelSpeeds[i] *= -1;
-                angleErrors[i] = Math.abs(Math.atan2(Math.sin(targetAngles[i] - currentAngles[i]), Math.cos(targetAngles[i] - currentAngles[i])));
-            }
+//            if (angleErrors[i] > Math.PI/2){
+//                targetAngles[i] = (targetAngles[i] + Math.PI) % (2*Math.PI);
+//                wheelSpeeds[i] *= -1;
+//                angleErrors[i] = Math.abs(Math.atan2(Math.sin(targetAngles[i] - currentAngles[i]), Math.cos(targetAngles[i] - currentAngles[i])));
+//            }
             wheelSpeeds[i] *= Math.abs(Math.cos(angleErrors[i]));
 
             if (!joystickIsIdle){
@@ -104,6 +104,8 @@ public class SwerveDrivetrainNew implements Subsystem {
             }
         }
 
+        wheelSpeeds[1]=-wheelSpeeds[1];
+        wheelSpeeds[2]=-wheelSpeeds[2];
         // Apply to each module
         for (int i = 0; i < swerveModules.length; i++) {
             swerveModules[i].setMotorPower(wheelSpeeds[i]);
