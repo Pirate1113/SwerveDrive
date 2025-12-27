@@ -13,7 +13,7 @@ public class SwerveDrivetrainNew implements Subsystem {
     public static final SwerveDrivetrainNew INSTANCE = new SwerveDrivetrainNew();
     private SwerveDrivetrainNew() {}
 
-    private final double ANALOG_VOLTAGE_COMPENSATION = 3.1865;
+    private final double ANALOG_VOLTAGE_COMPENSATION = 3.3;
     public static final double cacheTolerance = 0.1;
 
     public IMU imu;
@@ -27,16 +27,16 @@ public class SwerveDrivetrainNew implements Subsystem {
     @Override
     public void initialize(){
         fl_Module = new SwerveModule(new MotorEx("fl_motor").reversed(), "fl_rotation", true,
-                "fl_absolute", 1.7+Math.PI/2, true, ANALOG_VOLTAGE_COMPENSATION, -1, 1);
+                "fl_absolute", 6.21, true, ANALOG_VOLTAGE_COMPENSATION, -1, 1);
 
         bl_Module = new SwerveModule(new MotorEx("bl_motor"), "bl_rotation", true,
-                "bl_absolute", 1.489+Math.PI/2, true, ANALOG_VOLTAGE_COMPENSATION, -1, -1);
+                "bl_absolute", 4.823, true, ANALOG_VOLTAGE_COMPENSATION, -1, -1);
 
         br_Module = new SwerveModule(new MotorEx("br_motor"), "br_rotation", true,
-                "br_absolute", 0.2692+Math.PI/2, true, ANALOG_VOLTAGE_COMPENSATION, 1, -1);
+                "br_absolute", 0.10, true, ANALOG_VOLTAGE_COMPENSATION, 1, -1);
 
         fr_Module = new SwerveModule(new MotorEx("fr_motor").reversed(), "fr_rotation", true,
-                "fr_absolute", 3.224+Math.PI/2, true, ANALOG_VOLTAGE_COMPENSATION, 1, 1);
+                "fr_absolute", 1.91, true, ANALOG_VOLTAGE_COMPENSATION, 1, 1);
 
         swerveModules = new SwerveModule[]{fl_Module, bl_Module, br_Module, fr_Module};
 
@@ -92,11 +92,11 @@ public class SwerveDrivetrainNew implements Subsystem {
 
         for (int i = 0; i < swerveModules.length; i++){
             angleErrors[i] = Math.abs(Math.atan2(Math.sin(targetAngles[i] - currentAngles[i]), Math.cos(targetAngles[i] - currentAngles[i])));
-//            if (angleErrors[i] > Math.PI/2){
-//                targetAngles[i] = (targetAngles[i] + Math.PI) % (2*Math.PI);
-//                wheelSpeeds[i] *= -1;
-//                angleErrors[i] = Math.abs(Math.atan2(Math.sin(targetAngles[i] - currentAngles[i]), Math.cos(targetAngles[i] - currentAngles[i])));
-//            }
+            if (angleErrors[i] > Math.PI/2){
+                targetAngles[i] = (targetAngles[i] + Math.PI) % (2*Math.PI);
+                wheelSpeeds[i] *= -1;
+                angleErrors[i] = Math.abs(Math.atan2(Math.sin(targetAngles[i] - currentAngles[i]), Math.cos(targetAngles[i] - currentAngles[i])));
+            }
             wheelSpeeds[i] *= Math.abs(Math.cos(angleErrors[i]));
 
             if (!joystickIsIdle){
