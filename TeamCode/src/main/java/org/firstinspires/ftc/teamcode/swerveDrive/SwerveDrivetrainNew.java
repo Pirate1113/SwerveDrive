@@ -32,10 +32,10 @@ public class SwerveDrivetrainNew implements Subsystem {
         bl_Module = new SwerveModule(new MotorEx("bl_motor"), "bl_rotation", true,
                 "bl_absolute", 4.778, true, ANALOG_VOLTAGE_COMPENSATION, -1, -1);
 
-        br_Module = new SwerveModule(new MotorEx("br_motor").reversed(), "br_rotation", true,
+        br_Module = new SwerveModule(new MotorEx("br_motor"), "br_rotation", true,
                 "br_absolute", 0.053, true, ANALOG_VOLTAGE_COMPENSATION, 1, -1);
 
-        fr_Module = new SwerveModule(new MotorEx("fr_motor"), "fr_rotation", true,
+        fr_Module = new SwerveModule(new MotorEx("fr_motor").reversed(), "fr_rotation", true,
                 "fr_absolute", 1.910, true, ANALOG_VOLTAGE_COMPENSATION, 1, 1);
 
         swerveModules = new SwerveModule[]{fl_Module, bl_Module, br_Module, fr_Module};
