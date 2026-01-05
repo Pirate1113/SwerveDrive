@@ -21,13 +21,24 @@ public class SwerveDrivetrainNew implements Subsystem {
             RevHubOrientationOnRobot.UsbFacingDirection.RIGHT);
     public SwerveModule fl_Module, bl_Module, br_Module, fr_Module;
     public SwerveModule[] swerveModules;
+    private final double[] motorDirection = {
+            1, // FL
+            1, // BL
+            1, // BR
+            1 // FR
+    };
+
+
 
     double[] wheelSpeeds, targetAngles, currentAngles, angleErrors, cachedAngles;
 
     @Override
     public void initialize(){
-        fl_Module = new SwerveModule(new MotorEx("fl_motor").reversed(), "fl_rotation", true,
+//        fl_Module = new SwerveModule(new MotorEx("fl_motor").reversed(), "fl_rotation", true,
+//                "fl_absolute", 6.279, true, ANALOG_VOLTAGE_COMPENSATION, -1, 1);
+        fl_Module = new SwerveModule(new MotorEx("fl_motor"), "fl_rotation", true,
                 "fl_absolute", 6.279, true, ANALOG_VOLTAGE_COMPENSATION, -1, 1);
+
 
         bl_Module = new SwerveModule(new MotorEx("bl_motor"), "bl_rotation", true,
                 "bl_absolute", 4.778, true, ANALOG_VOLTAGE_COMPENSATION, -1, -1);
@@ -35,8 +46,20 @@ public class SwerveDrivetrainNew implements Subsystem {
         br_Module = new SwerveModule(new MotorEx("br_motor"), "br_rotation", true,
                 "br_absolute", 0.053, true, ANALOG_VOLTAGE_COMPENSATION, 1, -1);
 
-        fr_Module = new SwerveModule(new MotorEx("fr_motor").reversed(), "fr_rotation", true,
+//        fr_Module = new SwerveModule(new MotorEx("fr_motor").reversed(), "fr_rotation", true,
+//                "fr_absolute", 1.910, true, ANALOG_VOLTAGE_COMPENSATION, 1, 1);
+        fr_Module = new SwerveModule(new MotorEx("fr_motor"), "fr_rotation", true,
                 "fr_absolute", 1.910, true, ANALOG_VOLTAGE_COMPENSATION, 1, 1);
+
+        fl_Module.xOffset = -Math.abs(fl_Module.xOffset);  // ensure negative
+        bl_Module.xOffset = -Math.abs(bl_Module.xOffset);  // ensure negative
+        br_Module.xOffset = Math.abs(br_Module.xOffset);   // ensure positive
+        fr_Module.xOffset = Math.abs(fr_Module.xOffset);   // ensure positive
+
+        fl_Module.yOffset = Math.abs(fl_Module.yOffset);  // front = positive
+        fr_Module.yOffset = Math.abs(fr_Module.yOffset);
+        bl_Module.yOffset = -Math.abs(bl_Module.yOffset); // back = negative
+        br_Module.yOffset = -Math.abs(br_Module.yOffset);
 
         swerveModules = new SwerveModule[]{fl_Module, bl_Module, br_Module, fr_Module};
 
@@ -56,7 +79,7 @@ public class SwerveDrivetrainNew implements Subsystem {
     @Override
     public void periodic(){
         double rawLeftX = ActiveOpMode.gamepad1().left_stick_x,
-                rawLeftY = -ActiveOpMode.gamepad1().left_stick_y,
+                rawLeftY = ActiveOpMode.gamepad1().left_stick_y,
                 rawRightX = ActiveOpMode.gamepad1().right_stick_x,
                 realRightX = rawRightX / Math.sqrt(2);
         double imuHeading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
@@ -64,21 +87,58 @@ public class SwerveDrivetrainNew implements Subsystem {
         double tempY = rawLeftY;
         rawLeftX = tempX * Math.cos(-imuHeading) - tempY * Math.sin(-imuHeading);
         rawLeftY = tempX * Math.sin(-imuHeading) + tempY * Math.cos(-imuHeading);
+//        rawLeftY *= Math.signum(ActiveOpMode.gamepad1().left_stick_y);
+
+//        for (int i = 0; i < swerveModules.length; i++) {
+//            double rotVectorX = realRightX * swerveModules[i].yOffset;
+//            double rotVectorY = -1 * realRightX * swerveModules[i].xOffset;
+//
+//            double resultX = rawLeftX + rotVectorX;
+//            double resultY = rawLeftY + rotVectorY;
+//
+//            // Compute final speed + angle
+//            wheelSpeeds[i] = Math.sqrt(resultX * resultX + resultY * resultY);
+////            targetAngles[i] = Math.atan2(resultY, resultX);
+//            targetAngles[i] = Math.atan2(resultX, resultY);
+//
+//            currentAngles[i] = swerveModules[i].getPodHeading();
+//            // add
+//            double angleError = Math.atan2(
+//                    Math.sin(targetAngles[i] - currentAngles[i]),
+//                    Math.cos(targetAngles[i] - currentAngles[i])
+//            );
+//
+//            wheelSpeeds[i] *= Math.cos(angleError);
+//
+//        }
+        ActiveOpMode.telemetry().addData("rawLeftX (strafe)", rawLeftX);
+        ActiveOpMode.telemetry().addData("rawLeftY (forward)", rawLeftY);
+        ActiveOpMode.telemetry().addData("rawRightX (rotation)", rawRightX);
+        ActiveOpMode.telemetry().update();
+
 
         for (int i = 0; i < swerveModules.length; i++) {
-            double rotVectorX = realRightX * swerveModules[i].yOffset;
-            double rotVectorY = -1 * realRightX * swerveModules[i].xOffset;
+//            double rotVectorX = rawRightX * swerveModules[i].yOffset;
+//            double rotVectorY = -rawRightX * swerveModules[i].xOffset;
+
+            double rotVectorX = -rawRightX * swerveModules[i].yOffset;
+            double rotVectorY = rawRightX * swerveModules[i].xOffset;
 
             double resultX = rawLeftX + rotVectorX;
             double resultY = rawLeftY + rotVectorY;
 
-            // Compute final speed + angle
-            wheelSpeeds[i] = Math.sqrt(resultX * resultX + resultY * resultY);
+            wheelSpeeds[i] = Math.hypot(resultX, resultY);
             targetAngles[i] = Math.atan2(resultY, resultX);
-
             currentAngles[i] = swerveModules[i].getPodHeading();
 
+            double angleDiff = Math.atan2(Math.sin(targetAngles[i] - currentAngles[i]),
+                    Math.cos(targetAngles[i] - currentAngles[i]));
+            if (Math.abs(angleDiff) > Math.PI / 2) {
+                targetAngles[i] = (targetAngles[i] + Math.PI) % (2 * Math.PI);
+                wheelSpeeds[i] *= -1;
+            }
         }
+
 
         // === Normalize wheel speeds so none exceed 1.0 ===
         double max = Math.max(Math.max(wheelSpeeds[0], wheelSpeeds[1]),
@@ -97,8 +157,9 @@ public class SwerveDrivetrainNew implements Subsystem {
                 wheelSpeeds[i] *= -1;
                 angleErrors[i] = Math.abs(Math.atan2(Math.sin(targetAngles[i] - currentAngles[i]), Math.cos(targetAngles[i] - currentAngles[i])));
             }
-            wheelSpeeds[i] *= Math.abs(Math.cos(angleErrors[i]));
+//            wheelSpeeds[i] *= Math.abs(Math.cos(angleErrors[i]));
 
+            wheelSpeeds[i] *= Math.cos(angleErrors[i]);
             if (!joystickIsIdle){
                 cachedAngles[i] = targetAngles[i];
             }
@@ -108,7 +169,8 @@ public class SwerveDrivetrainNew implements Subsystem {
         wheelSpeeds[2]=-wheelSpeeds[2];
         // Apply to each module
         for (int i = 0; i < swerveModules.length; i++) {
-            swerveModules[i].setMotorPower(wheelSpeeds[i]);
+//            swerveModules[i].setMotorPower(wheelSpeeds[i]);
+            swerveModules[i].setMotorPower(wheelSpeeds[i] * motorDirection[i]);
             double commandedAngle = joystickIsIdle ? cachedAngles[i] : targetAngles[i];
             swerveModules[i].rotateTo(commandedAngle);
         }
