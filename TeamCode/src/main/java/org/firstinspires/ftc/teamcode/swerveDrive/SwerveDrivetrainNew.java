@@ -77,8 +77,10 @@ public class SwerveDrivetrainNew implements Subsystem {
         double imuHeading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
         double tempX = rawLeftX;
         double tempY = rawLeftY;
-        rawLeftX = tempX * Math.cos(-imuHeading) - tempY * Math.sin(-imuHeading);
-        rawLeftY = tempX * Math.sin(-imuHeading) + tempY * Math.cos(-imuHeading);
+//        rawLeftX = tempX * Math.cos(-imuHeading) - tempY * Math.sin(-imuHeading);
+//        rawLeftY = tempX * Math.sin(-imuHeading) + tempY * Math.cos(-imuHeading);
+        rawLeftY = tempX * Math.cos(-imuHeading) - tempY * Math.sin(-imuHeading);
+        rawLeftX = tempX * Math.sin(-imuHeading) + tempY * Math.cos(-imuHeading);
 
         ActiveOpMode.telemetry().addData("imuHeading(rad)", imuHeading);
         ActiveOpMode.telemetry().addData("robotX", rawLeftX);
@@ -99,9 +101,9 @@ public class SwerveDrivetrainNew implements Subsystem {
 
             // Compute final speed + angle
             wheelSpeeds[i] = Math.sqrt(resultX * resultX + resultY * resultY);
-//            targetAngles[i] = Math.atan2(resultY, resultX);
-            targetAngles[i] = Math.atan2(resultY, resultX) - Math.PI/2;
-            targetAngles[i] = (targetAngles[i] + 2*Math.PI) % (2*Math.PI);
+            targetAngles[i] = Math.atan2(resultY, resultX);
+//            targetAngles[i] = Math.atan2(resultY, resultX) - Math.PI/2;
+//            targetAngles[i] = (targetAngles[i] + 2*Math.PI) % (2*Math.PI);
 
             currentAngles[i] = swerveModules[i].getPodHeading();
             ActiveOpMode.telemetry().addData("Module " + i + " resultX", resultX);
