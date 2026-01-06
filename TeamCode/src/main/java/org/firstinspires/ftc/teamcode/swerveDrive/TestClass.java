@@ -43,6 +43,13 @@ public class TestClass extends OpMode {
         telemetry.addData("BRServo", brEncoder.getHeading());
         telemetry.addData("FRServo", frEncoder.getHeading());
 
+        telemetry.addData("FL current", flEncoder.getHeading());
+        telemetry.addData("FR current", frEncoder.getHeading());
+        telemetry.addData("BL current", blEncoder.getHeading());
+        telemetry.addData("BR current", brEncoder.getHeading());
+        telemetry.update();
+
+
         telemetry.update();
     }
 }

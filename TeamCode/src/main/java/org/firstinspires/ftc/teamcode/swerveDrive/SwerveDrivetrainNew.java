@@ -27,16 +27,16 @@ public class SwerveDrivetrainNew implements Subsystem {
     @Override
     public void initialize(){
         fl_Module = new SwerveModule(new MotorEx("fl_motor").reversed(), "fl_rotation", true,
-                "fl_absolute", 3.186, true, ANALOG_VOLTAGE_COMPENSATION, -1, 1);
+                "fl_absolute", 3.202, true, ANALOG_VOLTAGE_COMPENSATION, -1, 1);
 
-        bl_Module = new SwerveModule(new MotorEx("bl_motor"), "bl_rotation", true,
-                "bl_absolute", 1.646, true, ANALOG_VOLTAGE_COMPENSATION, -1, -1);
+        bl_Module = new SwerveModule(new MotorEx("bl_motor").reversed(), "bl_rotation", true,
+                "bl_absolute", 1.613, true, ANALOG_VOLTAGE_COMPENSATION, -1, -1);
 
         br_Module = new SwerveModule(new MotorEx("br_motor"), "br_rotation", true,
-                "br_absolute", 3.323, true, ANALOG_VOLTAGE_COMPENSATION, 1, -1);
+                "br_absolute", 0.208, true, ANALOG_VOLTAGE_COMPENSATION, 1, -1);
 
-        fr_Module = new SwerveModule(new MotorEx("fr_motor").reversed(), "fr_rotation", true,
-                "fr_absolute", 5.131, true, ANALOG_VOLTAGE_COMPENSATION, 1, 1);
+        fr_Module = new SwerveModule(new MotorEx("fr_motor"), "fr_rotation", true,
+                "fr_absolute", 1.957, true, ANALOG_VOLTAGE_COMPENSATION, 1, 1);
 
         swerveModules = new SwerveModule[]{fl_Module, bl_Module, br_Module, fr_Module};
 
@@ -59,9 +59,9 @@ public class SwerveDrivetrainNew implements Subsystem {
                 rawLeftY = -ActiveOpMode.gamepad1().left_stick_y,
                 rawRightX = ActiveOpMode.gamepad1().right_stick_x,
                 realRightX = rawRightX / Math.sqrt(2);
-        double fwd = -ActiveOpMode.gamepad1().left_stick_y;
-        double str =  ActiveOpMode.gamepad1().left_stick_x;
-        double rot =  ActiveOpMode.gamepad1().right_stick_x;
+//        double fwd = -ActiveOpMode.gamepad1().left_stick_y;
+//        double str =  ActiveOpMode.gamepad1().left_stick_x;
+//        double rot =  ActiveOpMode.gamepad1().right_stick_x;
 
 //        ActiveOpMode.telemetry().addData("fwd", fwd);
 //        ActiveOpMode.telemetry().addData("str", str);
@@ -69,17 +69,25 @@ public class SwerveDrivetrainNew implements Subsystem {
 //        ActiveOpMode.telemetry().update();
 
 
-        ActiveOpMode.telemetry().addData("rawLeftX", rawLeftX);
-        ActiveOpMode.telemetry().addData("rawLeftY", rawLeftY);
+//        ActiveOpMode.telemetry().addData("rawLeftX", rawLeftX);
+//        ActiveOpMode.telemetry().addData("rawLeftY", rawLeftY);
         ActiveOpMode.telemetry().addData("rawRightX", rawRightX);
         ActiveOpMode.telemetry().addData("realRightX", realRightX);
-        ActiveOpMode.telemetry().update();
 
         double imuHeading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
         double tempX = rawLeftX;
         double tempY = rawLeftY;
         rawLeftX = tempX * Math.cos(-imuHeading) - tempY * Math.sin(-imuHeading);
         rawLeftY = tempX * Math.sin(-imuHeading) + tempY * Math.cos(-imuHeading);
+
+        ActiveOpMode.telemetry().addData("imuHeading(rad)", imuHeading);
+        ActiveOpMode.telemetry().addData("robotX", rawLeftX);
+        ActiveOpMode.telemetry().addData("robotY", rawLeftY);
+
+//
+//        ActiveOpMode.telemetry().addData("rawLeftX after", rawLeftX);
+//        ActiveOpMode.telemetry().addData("rawLeftY after", rawLeftY);
+//        ActiveOpMode.telemetry().update();
 
 
         for (int i = 0; i < swerveModules.length; i++) {
@@ -91,11 +99,22 @@ public class SwerveDrivetrainNew implements Subsystem {
 
             // Compute final speed + angle
             wheelSpeeds[i] = Math.sqrt(resultX * resultX + resultY * resultY);
-            targetAngles[i] = Math.atan2(resultY, resultX);
+//            targetAngles[i] = Math.atan2(resultY, resultX);
+            targetAngles[i] = Math.atan2(resultY, resultX) - Math.PI/2;
+            targetAngles[i] = (targetAngles[i] + 2*Math.PI) % (2*Math.PI);
 
             currentAngles[i] = swerveModules[i].getPodHeading();
+            ActiveOpMode.telemetry().addData("Module " + i + " resultX", resultX);
+            ActiveOpMode.telemetry().addData("Module " + i + " resultY", resultY);
+            ActiveOpMode.telemetry().addData("Module " + i + " targetAngle(deg)", Math.toDegrees(targetAngles[i]));
+            ActiveOpMode.telemetry().addData("Module " + i + " currentAngle(deg)", Math.toDegrees(currentAngles[i]));
+            ActiveOpMode.telemetry().addData("Module " + i + " angleError(deg)",
+                    Math.toDegrees(Math.atan2(Math.sin(targetAngles[i] - currentAngles[i]),
+                            Math.cos(targetAngles[i] - currentAngles[i]))));
 
         }
+        ActiveOpMode.telemetry().update();
+
 
         // === Normalize wheel speeds so none exceed 1.0 ===
         double max = Math.max(Math.max(wheelSpeeds[0], wheelSpeeds[1]),
