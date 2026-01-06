@@ -93,8 +93,8 @@ public class SwerveDrivetrainNew implements Subsystem {
 
 
         for (int i = 0; i < swerveModules.length; i++) {
-            double rotVectorX = realRightX * swerveModules[i].yOffset;
-            double rotVectorY = -1 * realRightX * swerveModules[i].xOffset;
+            double rotVectorY =-1* realRightX * swerveModules[i].yOffset;
+            double rotVectorX = realRightX * swerveModules[i].xOffset;
 
             double resultX = rawLeftX + rotVectorX;
             double resultY = rawLeftY + rotVectorY;
@@ -106,9 +106,13 @@ public class SwerveDrivetrainNew implements Subsystem {
 //            targetAngles[i] = (targetAngles[i] + 2*Math.PI) % (2*Math.PI);
 
             currentAngles[i] = swerveModules[i].getPodHeading();
+            ActiveOpMode.telemetry().addData("Module " + i + " rotVectorX", rotVectorX);
+            ActiveOpMode.telemetry().addData("Module " + i + " rotVectorY", rotVectorY);
             ActiveOpMode.telemetry().addData("Module " + i + " resultX", resultX);
             ActiveOpMode.telemetry().addData("Module " + i + " resultY", resultY);
+            ActiveOpMode.telemetry().addData("Module " + i + " targetAngle", targetAngles[i]);
             ActiveOpMode.telemetry().addData("Module " + i + " targetAngle(deg)", Math.toDegrees(targetAngles[i]));
+            ActiveOpMode.telemetry().addData("Module " + i + " currentAngle", currentAngles[i]);
             ActiveOpMode.telemetry().addData("Module " + i + " currentAngle(deg)", Math.toDegrees(currentAngles[i]));
             ActiveOpMode.telemetry().addData("Module " + i + " angleError(deg)",
                     Math.toDegrees(Math.atan2(Math.sin(targetAngles[i] - currentAngles[i]),
