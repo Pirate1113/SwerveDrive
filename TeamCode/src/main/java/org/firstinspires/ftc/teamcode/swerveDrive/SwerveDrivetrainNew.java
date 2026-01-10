@@ -27,16 +27,16 @@ public class SwerveDrivetrainNew implements Subsystem {
     @Override
     public void initialize(){
         fl_Module = new SwerveModule(new MotorEx("fl_motor").reversed(), "fl_rotation", true,
-                "fl_absolute", 3.202, true, ANALOG_VOLTAGE_COMPENSATION, -1, 1);
+                "fl_absolute", 3.098, true, ANALOG_VOLTAGE_COMPENSATION, -1, 1);
 
         bl_Module = new SwerveModule(new MotorEx("bl_motor").reversed(), "bl_rotation", true,
-                "bl_absolute", 1.613, true, ANALOG_VOLTAGE_COMPENSATION, -1, -1);
+                "bl_absolute", 1.557, true, ANALOG_VOLTAGE_COMPENSATION, -1, -1);
 
         br_Module = new SwerveModule(new MotorEx("br_motor"), "br_rotation", true,
-                "br_absolute", 0.208, true, ANALOG_VOLTAGE_COMPENSATION, 1, -1);
+                "br_absolute", 0.185, true, ANALOG_VOLTAGE_COMPENSATION, 1, -1);
 
         fr_Module = new SwerveModule(new MotorEx("fr_motor"), "fr_rotation", true,
-                "fr_absolute", 1.957, true, ANALOG_VOLTAGE_COMPENSATION, 1, 1);
+                "fr_absolute", 2.011, true, ANALOG_VOLTAGE_COMPENSATION, 1, 1);
 
         swerveModules = new SwerveModule[]{fl_Module, bl_Module, br_Module, fr_Module};
 
@@ -93,8 +93,8 @@ public class SwerveDrivetrainNew implements Subsystem {
 
 
         for (int i = 0; i < swerveModules.length; i++) {
-            double rotVectorY =-1* realRightX * swerveModules[i].yOffset;
-            double rotVectorX = realRightX * swerveModules[i].xOffset;
+            double rotVectorY = realRightX * swerveModules[i].yOffset;
+            double rotVectorX = -1 * realRightX * swerveModules[i].xOffset;
 
             double resultX = rawLeftX + rotVectorX;
             double resultY = rawLeftY + rotVectorY;
@@ -153,4 +153,5 @@ public class SwerveDrivetrainNew implements Subsystem {
             swerveModules[i].rotateTo(commandedAngle);
         }
     }
+
 }
